@@ -221,6 +221,22 @@ client.on('messageCreate', async message=>{
 
   if(lower.startsWith('توبيخات ')){
     const nameIn = content.slice(8).trim(); 
+    
+    const isAdmin = hasAdminPermissions(message.member);
+    if (!isAdmin) {
+      return message.reply({
+        content: '🔒 **عذراً، يُسمح فقط للإداريين باستخدام هذا الأمر للبحث عن أعضاء آخرين!**',
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
+    if (!nameIn || nameIn.startsWith('_')) {
+      return message.reply({
+        content: '❌ **خطأ:** يجب أن يكون الأمر بهذه الصيغة: `توبيخاتي Name_surname` (مثال: `robio_iwan`).',
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
     const parsed = parseName(nameIn); 
     const resolved = await resolveKey(message.guild, parsed);
     let list = warns[message.guild.id]?.[resolved.key] || warns[message.guild.id]?.[nameIn.toLowerCase()] || [];
@@ -248,6 +264,22 @@ client.on('messageCreate', async message=>{
 
   if(lower.startsWith('تحذيرات ')){
     const nameIn = content.slice(9).trim(); 
+
+    const isAdmin = hasAdminPermissions(message.member);
+    if (!isAdmin) {
+      return message.reply({
+        content: '🔒 **عذراً، يُسمح فقط للإداريين باستخدام هذا الأمر للبحث عن أعضاء آخرين!**',
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
+    if (!nameIn || nameIn.startsWith('_')) {
+      return message.reply({
+        content: '❌ **خطأ:** يجب أن يكون الأمر بهذه الصيغة: `توبيخاتي Name_surname` (مثال: `robio_iwan`).',
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
     const parsed = parseName(nameIn); 
     const resolved = await resolveKey(message.guild, parsed);
     let list = tahdirs[message.guild.id]?.[resolved.key] || tahdirs[message.guild.id]?.[nameIn.toLowerCase()] || [];
@@ -468,7 +500,11 @@ client.on('interactionCreate', async interaction=>{
     }
 
     if(interaction.commandName==='mywarns' || interaction.commandName==='warns'){
-      const nameIn = interaction.options.getString('name'); let targetDisplay=''; let list=[];
+      const nameIn = interaction.options.getString('name'); 
+      if(nameIn && !hasAdminPermissions(interaction.member)){
+        return interaction.reply({content: '🔒 **عذراً، يُسمح فقط للإداريين باستخدام هذا الأمر للبحث عن أعضاء آخرين!**', ephemeral: true});
+      }
+      let targetDisplay=''; let list=[];
       if(!nameIn){ 
         targetDisplay=`<@${interaction.user.id}>`; 
         list=warns[interaction.guildId]?.[interaction.user.id]||warns[interaction.guildId]?.[(interaction.member?.displayName||interaction.user.username).toLowerCase()]||[]; 
@@ -490,7 +526,11 @@ client.on('interactionCreate', async interaction=>{
     }
 
     if(interaction.commandName==='mytahdirs' || interaction.commandName==='tahdirs'){
-      const nameIn = interaction.options.getString('name'); let targetDisplay=''; let list=[];
+      const nameIn = interaction.options.getString('name'); 
+      if(nameIn && !hasAdminPermissions(interaction.member)){
+        return interaction.reply({content: '🔒 **عذراً، يُسمح فقط للإداريين باستخدام هذا الأمر للبحث عن أعضاء آخرين!**', ephemeral: true});
+      }
+      let targetDisplay=''; let list=[];
       if(!nameIn){ 
         targetDisplay=`<@${interaction.user.id}>`; 
         list=tahdirs[interaction.guildId]?.[interaction.user.id]||tahdirs[interaction.guildId]?.[(interaction.member?.displayName||interaction.user.username).toLowerCase()]||[]; 
